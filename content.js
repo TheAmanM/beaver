@@ -451,8 +451,11 @@ input:where([type="button"], [type="reset"], [type="submit"]),
   padding-inline: 0.75rem;
   height: 3rem;
   aspect-ratio: 1;
-
+  
   border-radius: 100%;
+}
+
+#acorn-nav-top > div:nth-child(2) > div > div:not(:last-child) {
   background-color: var(--color-secondary);
 }
 
@@ -491,7 +494,7 @@ ul.nav-section-container .nav-header {
   line-height: 19px;
   color: #ecf1f9;
   opacity: 0.5;
-  margin-bottom: -0.75rem;
+  margin-bottom: -0.25rem;
   margin-top: 2rem;
 }
 
@@ -618,6 +621,12 @@ nav#acorn-nav-top > div:nth-child(1) > .flex-display {
   height: 5rem;
 }
 
+.navbar-profile { 
+  background-color: var(--color-acorn);
+  color: white;
+  font-size: 1.5rem;
+}
+
 `;
 
   const linkToSvg = {
@@ -651,7 +660,7 @@ nav#acorn-nav-top > div:nth-child(1) > .flex-display {
     "Family Care": "family.svg",
   };
 
-  function todaysTimetable() {
+  (function todaysTimetable() {
     const calendar = document.querySelector(
       ".card-container.dashboard-container"
     );
@@ -715,7 +724,7 @@ nav#acorn-nav-top > div:nth-child(1) > .flex-display {
       childList: true,
       subtree: true,
     });
-  }
+  })();
 
   function injectContent() {
     console.log("Injecting content");
@@ -861,6 +870,7 @@ nav#acorn-nav-top > div:nth-child(1) > .flex-display {
       const sidebar = acorn.children[1].children[0];
       const dashboard = acorn.children[1].children[1];
       const topbar = acorn.children[0];
+      const notifications = acorn.children[1].children[2];
 
       // Create the new main container
       const main = document.createElement("div");
@@ -875,6 +885,7 @@ nav#acorn-nav-top > div:nth-child(1) > .flex-display {
 
       // Replace contents with the new main
       acorn.replaceChild(main, contents);
+      main.appendChild(notifications);
 
       acorn.style.setProperty("display", "flex");
     })();
@@ -927,23 +938,47 @@ nav#acorn-nav-top > div:nth-child(1) > .flex-display {
           navBar.children[0].querySelector("a").replaceWith(anchor);
         });
 
-      // fetch(
-      //   "https://raw.githubusercontent.com/TheAmanM/beaver/refs/heads/main/src/navIcons/notifications.svg"
-      // )
-      //   .then((response) => response.text())
-      //   .then((svgText) => {
-      //     // Parse the SVG text into DOM elements
-      //     const parser = new DOMParser();
-      //     const svgDoc = parser.parseFromString(svgText, "image/svg+xml");
-      //     const svgElement = svgDoc.documentElement;
+      fetch(
+        "https://raw.githubusercontent.com/TheAmanM/beaver/refs/heads/main/src/navIcons/notifications.svg"
+      )
+        .then((response) => response.text())
+        .then((svgText) => {
+          // Parse the SVG text into DOM elements
+          const parser = new DOMParser();
+          const svgDoc = parser.parseFromString(svgText, "image/svg+xml");
+          const svgElement = svgDoc.documentElement;
 
-      //     navBar.children[1]
-      //       .querySelector(".badge-num")
-      //       .replaceWith(svgElement);
-      //   });
+          navBar.children[1]
+            .querySelector(".badge-num")
+            .replaceWith(svgElement);
+        });
+
+      let profilElement = navBar.children[2];
+      const text = profilElement.innerText[0];
+      profilElement.remove();
+
+      profilElement = document.createElement("div");
+      profilElement.className = "navbar-profile";
+      const anchor = document.createElement("a");
+      anchor.setAttribute("href", "auth/logout");
+      anchor.innerText = text;
+      profilElement.appendChild(anchor);
+      navBar.appendChild(profilElement);
+
+      /* profilElement.className = "navbar-profile";
+      profilElement.children[1].remove();
+      profilElement.children[0].innerHTML = profilElement.innerText[0];
+
+      const link = profilElement.querySelector("a");
+      console.log("link");
+      console.log(link);
+      link.setAttribute("href", "/auth/logout");
+      profilElement.onclick = null;
+      // link.addEventListener("click", (e) => {
+      //   console.log("Fired click!");
+      //   e.stopPropagation();
+      // }); */
     })();
-
-    todaysTimetable();
   }
 
   // Function to remove all <style> and <link rel="stylesheet"> tags
