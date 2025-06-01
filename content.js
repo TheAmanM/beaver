@@ -1,5 +1,4 @@
-// content.js
-(async function () {
+const runner = async () => {
   const EXTERNAL_CSS_URL =
     "https://raw.githubusercontent.com/TheAmanM/beaver/refs/heads/main/main.css";
 
@@ -20,6 +19,7 @@
   margin: 0; /* 2 */
   padding: 0; /* 2 */
   border: 0 solid; /* 3 */
+  outline: none !important;
 }
 
 /*
@@ -429,7 +429,7 @@ input:where([type="button"], [type="reset"], [type="submit"]),
   align-items: center;
   padding-inline: 2rem;
 
-  padding-block: 1rem;
+  padding-block: 1.5rem;
   padding-inline: 2rem;
 }
 
@@ -444,23 +444,27 @@ input:where([type="button"], [type="reset"], [type="submit"]),
   gap: 1rem;
 }
 
-#acorn-nav-top > div:nth-child(2) > div > div:not(:last-child) {
+#acorn-nav-top > div:nth-child(2) > div > div {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   padding-inline: 0.75rem;
+  height: 3rem;
+  aspect-ratio: 1;
 
-  border-radius: 0.75rem;
-  background-color: white;
-  border: 0.5px solid var(--border);
+  border-radius: 100%;
+  background-color: var(--color-secondary);
 }
 
 #body-container {
   display: flex;
 }
 
-#body-container > div:nth-child(2) {
+.main {
   flex: 1 1 0;
+}
+
+#main-content {
   width: 100%;
   max-width: 80rem;
   margin-inline: auto;
@@ -501,6 +505,13 @@ ul.nav-section-container :not(.nav-header) {
 
 ul.nav-section-container li {
   margin-block: 1rem;
+}
+
+.page-title {
+  font-size: 3rem;
+  font-weight: 600;
+  margin-bottom: 2rem;
+  color: var(--color-acorn);
 }
 
 .global-message {
@@ -580,6 +591,7 @@ profile-checklist > svg, calendar > svg {
   position: absolute;
   bottom: 0px;
   right: 0px;
+  pointer-events: none;
 
   border-bottom-right-radius: 1.5rem;
 }
@@ -591,6 +603,19 @@ calendar .mat-mdc-card-actions {
   font-weight: 300;
   font-size: 18px;
   line-height: 24px;
+}
+
+nav#acorn-nav-top > div:nth-child(1) > .flex-display {
+  border: 1px solid red;
+}
+
+.sidebar-logo {
+  margin-inline: auto;
+  margin-block-start: 2rem;
+}
+
+.acornLogo {
+  height: 5rem;
 }
 
 `;
@@ -642,56 +667,50 @@ calendar .mat-mdc-card-actions {
             node.nodeType === Node.ELEMENT_NODE &&
             node.innerHTML.includes("You don't have any activities")
           ) {
-            (function () {
-              const todaysTimetableElements = calendar.querySelectorAll(
-                ".mat-mdc-card-content div"
-              );
-              console.log("Running replacer 3");
-              console.log(todaysTimetableElements);
-              for (const randomDiv of todaysTimetableElements) {
-                console.log("Checking 3");
-                if (
-                  randomDiv.innerText.includes("You don't have any activities")
-                ) {
-                  console.log("Found! 3");
-                  const replacer = document.createElement("p");
-                  replacer.innerHTML = `You don’t have any actual activities planned for today. <a href="https://www.utoronto.ca/events">Here’s what’s on at here today</a>.`;
-                  calendar
-                    .querySelector(".mat-mdc-card-content")
-                    .replaceWith(replacer);
-                  console.log("Replaced! 3");
-
-                  observer.disconnect();
-
-                  (function () {
-                    fetch(
-                      "https://raw.githubusercontent.com/TheAmanM/beaver/refs/heads/main/src/backgrounds/calendar.svg"
-                    )
-                      .then((response) => response.text())
-                      .then((svgText) => {
-                        // Parse the SVG text into DOM elements
-                        const parser = new DOMParser();
-                        const svgDoc = parser.parseFromString(
-                          svgText,
-                          "image/svg+xml"
-                        );
-                        const svgElement = svgDoc.documentElement;
-
-                        document
-                          .querySelector("calendar")
-                          .appendChild(svgElement);
-                      });
-                  })();
-
-                  break;
-                }
-              }
-            })();
+            replaceTimetableContent();
           }
         }
       }
     });
 
+    function replaceTimetableContent() {
+      const todaysTimetableElements = calendar.querySelectorAll(
+        ".mat-mdc-card-content div"
+      );
+      console.log("Running replacer 3");
+      console.log(todaysTimetableElements);
+      for (const randomDiv of todaysTimetableElements) {
+        console.log("Checking 3");
+        if (randomDiv.innerText.includes("You don't have any activities")) {
+          console.log("Found! 3");
+          const replacer = document.createElement("p");
+          replacer.innerHTML = `You don’t have any actual activities planned for today. <a href="https://www.utoronto.ca/events">Here’s what’s on at here today</a>.`;
+          calendar.querySelector(".mat-mdc-card-content").replaceWith(replacer);
+          console.log("Replaced! 3");
+
+          observer.disconnect();
+
+          (function () {
+            fetch(
+              "https://raw.githubusercontent.com/TheAmanM/beaver/refs/heads/main/src/backgrounds/calendar.svg"
+            )
+              .then((response) => response.text())
+              .then((svgText) => {
+                // Parse the SVG text into DOM elements
+                const parser = new DOMParser();
+                const svgDoc = parser.parseFromString(svgText, "image/svg+xml");
+                const svgElement = svgDoc.documentElement;
+
+                document.querySelector("calendar").appendChild(svgElement);
+              });
+          })();
+
+          break;
+        }
+      }
+    }
+
+    replaceTimetableContent();
     observer.observe(calendar, {
       childList: true,
       subtree: true,
@@ -833,6 +852,97 @@ calendar .mat-mdc-card-actions {
         });
     })();
 
+    // Rearranging the sidebar
+
+    (function () {
+      // Get references to the needed elements
+      const acorn = document.querySelector(".acorn");
+      const contents = acorn.children[1];
+      const sidebar = acorn.children[1].children[0];
+      const dashboard = acorn.children[1].children[1];
+      const topbar = acorn.children[0];
+
+      // Create the new main container
+      const main = document.createElement("div");
+      main.classList.add("main");
+
+      // Move topbar and dashboard into the new main container
+      main.appendChild(topbar);
+      main.appendChild(dashboard);
+
+      // Move sidebar outside contents and into .acorn
+      acorn.insertBefore(sidebar, contents);
+
+      // Replace contents with the new main
+      acorn.replaceChild(main, contents);
+
+      acorn.style.setProperty("display", "flex");
+    })();
+
+    // Adding logo to sidebar
+
+    (function () {
+      const logoImage = document.createElement("img");
+      logoImage.className = "sidebar-logo";
+      logoImage.setAttribute(
+        "src",
+        "https://acorn.utoronto.ca/sws/assets/images/top_navigation/uoft_logo_v2_2x.png"
+      );
+      const navBar = document.querySelector("side-nav");
+      navBar.insertBefore(logoImage, navBar.firstChild);
+    })();
+
+    // Fixing the top bar (lgoo and buttons)
+    (function () {
+      const topBar = document.querySelector("#acorn-nav-top");
+
+      const acornLogo = document.createElement("img");
+      acornLogo.className = "acornLogo";
+      acornLogo.setAttribute(
+        "src",
+        "https://undergrad.engineering.utoronto.ca/wp-content/uploads/2019/04/ACORNLogo.png"
+      );
+      topBar.children[0].replaceWith(acornLogo);
+    })();
+
+    (function () {
+      const navBar = document.querySelector("nav#acorn-nav-top .flex-display");
+      document.createElement("svg");
+
+      fetch(
+        "https://raw.githubusercontent.com/TheAmanM/beaver/refs/heads/main/src/navIcons/help.svg"
+      )
+        .then((response) => response.text())
+        .then((svgText) => {
+          // Parse the SVG text into DOM elements
+          const parser = new DOMParser();
+          const svgDoc = parser.parseFromString(svgText, "image/svg+xml");
+          const svgElement = svgDoc.documentElement;
+
+          // Create a new <a> element to wrap the SVG
+          const anchor = document.createElement("a");
+          anchor.href = "#/help-and-feedback/contacts-resources";
+          anchor.appendChild(svgElement);
+
+          navBar.children[0].querySelector("a").replaceWith(anchor);
+        });
+
+      // fetch(
+      //   "https://raw.githubusercontent.com/TheAmanM/beaver/refs/heads/main/src/navIcons/notifications.svg"
+      // )
+      //   .then((response) => response.text())
+      //   .then((svgText) => {
+      //     // Parse the SVG text into DOM elements
+      //     const parser = new DOMParser();
+      //     const svgDoc = parser.parseFromString(svgText, "image/svg+xml");
+      //     const svgElement = svgDoc.documentElement;
+
+      //     navBar.children[1]
+      //       .querySelector(".badge-num")
+      //       .replaceWith(svgElement);
+      //   });
+    })();
+
     todaysTimetable();
   }
 
@@ -891,4 +1001,17 @@ calendar .mat-mdc-card-actions {
 
   // 2. Inject the custom CSS from the external URL
   await injectCustomCssFromExternalUrl(); // Use await because fetch is asynchronous
+};
+
+(() => {
+  chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (message.action === "run") {
+      console.log(
+        "Hello from content script! Running code on:",
+        window.location.href
+      );
+      runner();
+      sendResponse({ status: "done" });
+    }
+  });
 })();

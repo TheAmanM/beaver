@@ -1,5 +1,6 @@
 {
   "name": "beaver",
+  "type": "commonjs",
   "version": "0.1.0",
   "description": "Make Make Acorn great again!",
   "main": "background.ts",
