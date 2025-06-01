@@ -1,0 +1,21 @@
+{
+  "manifest_version": 3,
+  "name": "Beaver",
+  "version": "0.1",
+  "description": "Make Acorn great again!",
+  "permissions": ["activeTab", "scripting"],
+  "host_permissions": [
+    "*://acorn.utoronto.ca/sws/*",
+    "*://raw.githubusercontent.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://acorn.utoronto.ca/sws/*"],
+      "js": ["content.js"],
+      "run_at": "document_end"
+    }
+  ]
+}
