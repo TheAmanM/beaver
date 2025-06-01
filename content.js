@@ -3,41 +3,7 @@
   const EXTERNAL_CSS_URL =
     "https://raw.githubusercontent.com/TheAmanM/beaver/refs/heads/main/main.css";
 
-  // Function to remove all <style> and <link rel="stylesheet"> tags
-  function removeAllStylingTags() {
-    // Remove <style> tags
-    const styleTags = document.querySelectorAll("style");
-    styleTags.forEach((tag) => {
-      tag.remove();
-    });
-
-    // Remove <link rel="stylesheet"> tags
-    const linkTags = document.querySelectorAll('link[rel="stylesheet"]');
-    linkTags.forEach((tag) => {
-      tag.remove();
-    });
-  }
-
-  // Function to fetch custom CSS and inject it as a <style> tag
-  async function injectCustomCssFromExternalUrl() {
-    try {
-      const response = await fetch(EXTERNAL_CSS_URL);
-
-      if (!response.ok) {
-        throw new Error(
-          `HTTP error! status: ${response.status} - ${response.statusText}`
-        );
-      }
-      const cssText = await response.text();
-      console.log(
-        `%c \u2713 ` + `%c Beaver styling complete!`,
-        `background-color: #0dbc7b; color: white;`,
-        "color: #0dbc7b;"
-      );
-
-      const style = document.createElement("style");
-      style.nodeType = "text/css";
-      style.textContent = `@import url("https://fonts.googleapis.com/css2?family=Open+Sans:wdth,wght@75..100,300..800&display=swap");
+  const cssData = `@import url("https://fonts.googleapis.com/css2?family=Open+Sans:wdth,wght@75..100,300..800&display=swap");
 
 /*
   1. Prevent padding and border from affecting element width. (https://github.com/mozdevs/cssremedy/issues/4)
@@ -497,9 +463,9 @@ body {
 }
 
 side-nav#acorn-nav-side-parent {
-  width: 24rem;
-  max-width: 24rem;
-  min-width: 24rem;
+  width: 22rem;
+  max-width: 22rem;
+  min-width: 22rem;
   /* TODO: Make this proper */
 
   background-color: var(--color-acorn);
@@ -510,10 +476,6 @@ ul.nav-section-container {
   padding-block-start: 1rem;
 }
 
-ul.nav-section-container > * {
-  margin-bottom: 2rem;
-}
-
 ul.nav-section-container .nav-header {
   font-family: "Open Sans";
   font-weight: 600;
@@ -521,6 +483,8 @@ ul.nav-section-container .nav-header {
   line-height: 19px;
   color: #ecf1f9;
   opacity: 0.5;
+  margin-bottom: -0.75rem;
+  margin-top: 2rem;
 }
 
 ul.nav-section-container :not(.nav-header) {
@@ -532,11 +496,210 @@ ul.nav-section-container :not(.nav-header) {
 }
 
 ul.nav-section-container li {
-  margin-block: 1.25rem;
+  margin-block: 1rem;
 }
-`; // Inject the fetched CSS text
+`;
+
+  const linkToSvg = {
+    Dashboard: "dashboard.svg",
+    "Profile & Settings": "profile-settings.svg",
+    "Enrol & Manage": "enrol-manage.svg",
+    Courses: "courses.svg",
+    Programs: "programs.svg",
+    "Timetable & Exams": "timetable-exams.svg",
+    "Accommodated Testing Services": "accommodated.svg",
+    "Planning Tools": "planning.svg",
+    "Academic History": "history.svg",
+    "Transcript & Enrolment Confirmation": "transcript-enrolment.svg",
+    "Graduation & Convocation": "graduation.svg",
+    Quercus: "quercus.svg",
+    "Financial Account": "financial.svg",
+    "Invoice & Net Cost": "invoice.svg",
+    "Incidental Fees": "incidental.svg",
+    "Payment History": "payment-history.svg",
+    "Account Details": "account-details.svg",
+    "Make a Payment": "payment.svg",
+    "Grants, Aid & Awards": "grants.svg",
+    "Tuition Fee Deferral": "deferral.svg",
+    "Tax Forms": "tax.svg",
+    "Health & Wellness": "health.svg",
+    Involvement: "involvement.svg",
+    "Jobs & Career Planning": "jobs.svg",
+    "Accessibility & Equity": "equity.svg",
+    "International Opportunities": "international.svg",
+    Housing: "housing.svg",
+    "Family Care": "family.svg",
+  };
+
+  function injectContent() {
+    console.log("Injecting content");
+
+    // const linksList = document.querySelector(".financial.expand-container");
+
+    /* for (const linksList of [
+      document.querySelector(".financial.expand-container"),
+      document.querySelector(".enrol.expand-container"),
+    ]) {
+      // Get the parent UL element (assuming the linksList is an <li> inside it)
+      // Get the parent <ul> element
+      const parentUL = linksList.parentElement;
+
+      // Reference to insert before the first child of the parent <ul>
+      const firstChild = parentUL.firstElementChild;
+
+      // Move the main <a> link into a new <li> and insert it at the start
+      const mainLink = linksList.querySelector("a");
+      if (mainLink) {
+        const newLI = document.createElement("li");
+        newLI.appendChild(mainLink);
+        parentUL.insertBefore(newLI, firstChild);
+      }
+
+      // Collect the <li> items from the nested <ul>
+      const nestedLIs = linksList.querySelectorAll("ul > li");
+
+      // Insert each <li> at the start in reverse order to preserve original order
+      [...nestedLIs].reverse().forEach((li) => {
+        parentUL.insertBefore(li, firstChild);
+      });
+
+      // Remove the now-empty linksList container
+      linksList.remove();
+    } */
+
+    (function () {
+      const financialList = document.querySelector(
+        ".financial.expand-container"
+      );
+      const parentUL = financialList.parentElement;
+
+      // Reference to insert before the first child of the parent <ul>
+      const firstChild = parentUL.firstElementChild;
+
+      // Move the main <a> link into a new <li> and insert it at the start
+      const mainLink = financialList.querySelector("a");
+      if (mainLink) {
+        const newLI = document.createElement("li");
+        newLI.appendChild(mainLink);
+        parentUL.insertBefore(newLI, firstChild);
+      }
+
+      // Collect the <li> items from the nested <ul>
+      const nestedLIs = financialList.querySelectorAll("ul > li");
+
+      // Insert each <li> at the start in reverse order to preserve original order
+      [...nestedLIs].reverse().forEach((li) => {
+        parentUL.insertBefore(li, firstChild);
+      });
+
+      // Remove the now-empty financialList container
+      financialList.remove();
+    })();
+
+    (function () {
+      const academicList = document.querySelector(".enrol.expand-container");
+      const parentUL = academicList.parentElement;
+
+      // Reference to insert before the first child of the parent <ul>
+      const firstChild = parentUL.firstElementChild;
+
+      // Move the main <a> link into a new <li> and insert it at the start
+      const mainLink = academicList.querySelector("a > acorn-block-tooltip");
+      if (mainLink) {
+        const newLI = document.createElement("li");
+        newLI.appendChild(mainLink);
+        parentUL.insertBefore(newLI, firstChild);
+      }
+
+      // Collect the <li> items from the nested <ul>
+      const nestedLIs = academicList.querySelectorAll("ul > li");
+
+      // Insert each <li> at the start in reverse order to preserve original order
+      [...nestedLIs].reverse().forEach((li) => {
+        parentUL.insertBefore(li, firstChild);
+      });
+
+      // Remove the now-empty academicList container
+      academicList.remove();
+    })();
+
+    const sidebarLinks = document.querySelectorAll(
+      "ul.nav-section-container a"
+    );
+
+    for (const link of sidebarLinks) {
+      if (link.innerText && link.innerText in linkToSvg) {
+        console.log("Found:", link.innerText);
+        const parent = link.parentElement;
+        fetch(
+          "https://raw.githubusercontent.com/TheAmanM/beaver/refs/heads/main/src/" +
+            linkToSvg[link.innerText]
+        )
+          .then((response) => response.text())
+          .then((svgText) => {
+            // Parse the SVG text into DOM elements
+            const parser = new DOMParser();
+            const svgDoc = parser.parseFromString(svgText, "image/svg+xml");
+            const svgElement = svgDoc.documentElement;
+
+            // Insert SVG as first child of 'parent'
+            if (parent.firstChild) {
+              parent.insertBefore(svgElement, parent.firstChild);
+            } else {
+              parent.appendChild(svgElement);
+            }
+
+            parent.style.setProperty("display", "flex");
+            parent.style.setProperty("gap", "0.5rem");
+          });
+      }
+    }
+
+    const quercusLink = document.querySelector(
+      ".nav-section-container sis-icon"
+    );
+    quercusLink.remove();
+  }
+
+  // Function to remove all <style> and <link rel="stylesheet"> tags
+  function removeAllStylingTags() {
+    // Remove <style> tags
+    const styleTags = document.querySelectorAll("style");
+    styleTags.forEach((tag) => {
+      tag.remove();
+    });
+
+    // Remove <link rel="stylesheet"> tags
+    const linkTags = document.querySelectorAll('link[rel="stylesheet"]');
+    linkTags.forEach((tag) => {
+      tag.remove();
+    });
+  }
+
+  // Function to fetch custom CSS and inject it as a <style> tag
+  async function injectCustomCssFromExternalUrl() {
+    try {
+      // const response = await fetch(EXTERNAL_CSS_URL);
+
+      // if (!response.ok) {
+      //   throw new Error(
+      //     `HTTP error! status: ${response.status} - ${response.statusText}`
+      //   );
+      // }
+      // const cssText = await response.text();
+      console.log(
+        `%c \u2713 ` + `%c Beaver styling complete!`,
+        `background-color: #0dbc7b; color: white;`,
+        "color: #0dbc7b;"
+      );
+
+      const style = document.createElement("style");
+      style.nodeType = "text/css";
+      style.textContent = cssData; // Inject the fetched CSS text
       document.head.appendChild(style);
       console.log("Custom CSS injected into document.head.");
+
+      injectContent();
     } catch (error) {
       console.error("Failed to inject custom CSS from external URL:", error);
       // Log the error for debugging purposes
