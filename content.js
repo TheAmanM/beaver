@@ -409,14 +409,11 @@ input:where([type="button"], [type="reset"], [type="submit"]),
 
 :root {
   --color-acorn: #013a6f;
+  --color-secondary: #ecf1f9;
 
-  --color-bg: #ebf0f8;
+  --body-text: #76787c;
   --color-primary: #aaa;
   --border: #ddd;
-}
-
-body {
-  background-color: var(--color-bg);
 }
 
 #scrollMain {
@@ -462,6 +459,13 @@ body {
   display: flex;
 }
 
+#body-container > div:nth-child(2) {
+  flex: 1 1 0;
+  width: 100%;
+  max-width: 80rem;
+  margin-inline: auto;
+}
+
 side-nav#acorn-nav-side-parent {
   width: 22rem;
   max-width: 22rem;
@@ -498,6 +502,97 @@ ul.nav-section-container :not(.nav-header) {
 ul.nav-section-container li {
   margin-block: 1rem;
 }
+
+.global-message {
+  padding: 0.75rem 2rem;
+  border: 4px solid var(--color-acorn);
+  border-radius: 1.5rem;
+}
+
+.alert-body .acorn-notice-margin {
+  font-family: "Open Sans";
+  color: var(--color-acorn);
+  font-weight: 500;
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.alert-body p {
+  font-family: "Open Sans";
+  font-style: normal;
+  font-weight: 300;
+  font-size: 18px;
+  line-height: 24px;
+  color: var(--body-text);
+
+  margin-top: 0.5rem;
+}
+
+.alert-body p a {
+  color: var(--color-acorn);
+}
+
+@media screen and (min-width: 64rem) {
+  .card-container.dashboard-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+}
+
+.card-container a {
+  color: var(--color-acorn);
+}
+
+.card-container.dashboard-container {
+  margin-top: 1.5rem;
+}
+
+.card-container.dashboard-container > * {
+  background: var(--color-secondary);
+  padding-block: 1.25rem;
+  padding-inline: 2rem;
+  border-radius: 1.5rem;
+}
+
+.card-container.dashboard-container > * h2 {
+  font-size: 2rem;
+  font-weight: 600;
+  color: var(--color-acorn);
+}
+
+profile-checklist p, calendar p {
+  font-family: "Open Sans";
+  font-style: normal;
+  font-weight: 300;
+  font-size: 18px;
+  line-height: 24px;
+  color: var(--body-text);
+
+  margin-block: 0.5rem;
+}
+
+profile-checklist, calendar {
+  position: relative;
+}
+
+profile-checklist > svg, calendar > svg {
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+
+  border-bottom-right-radius: 1.5rem;
+}
+
+
+calendar .mat-mdc-card-actions {
+  font-family: "Open Sans";
+  font-style: normal;
+  font-weight: 300;
+  font-size: 18px;
+  line-height: 24px;
+}
+
 `;
 
   const linkToSvg = {
@@ -531,41 +626,80 @@ ul.nav-section-container li {
     "Family Care": "family.svg",
   };
 
+  function todaysTimetable() {
+    const calendar = document.querySelector(
+      ".card-container.dashboard-container"
+    );
+
+    console.log("Replacing! 3");
+
+    const observer = new MutationObserver((mutationsList, observer) => {
+      for (const mutation of mutationsList) {
+        // Check added or modified nodes
+        const nodes = [...mutation.addedNodes, ...mutation.target.childNodes];
+        for (const node of nodes) {
+          if (
+            node.nodeType === Node.ELEMENT_NODE &&
+            node.innerHTML.includes("You don't have any activities")
+          ) {
+            (function () {
+              const todaysTimetableElements = calendar.querySelectorAll(
+                ".mat-mdc-card-content div"
+              );
+              console.log("Running replacer 3");
+              console.log(todaysTimetableElements);
+              for (const randomDiv of todaysTimetableElements) {
+                console.log("Checking 3");
+                if (
+                  randomDiv.innerText.includes("You don't have any activities")
+                ) {
+                  console.log("Found! 3");
+                  const replacer = document.createElement("p");
+                  replacer.innerHTML = `You don’t have any actual activities planned for today. <a href="https://www.utoronto.ca/events">Here’s what’s on at here today</a>.`;
+                  calendar
+                    .querySelector(".mat-mdc-card-content")
+                    .replaceWith(replacer);
+                  console.log("Replaced! 3");
+
+                  observer.disconnect();
+
+                  (function () {
+                    fetch(
+                      "https://raw.githubusercontent.com/TheAmanM/beaver/refs/heads/main/src/backgrounds/calendar.svg"
+                    )
+                      .then((response) => response.text())
+                      .then((svgText) => {
+                        // Parse the SVG text into DOM elements
+                        const parser = new DOMParser();
+                        const svgDoc = parser.parseFromString(
+                          svgText,
+                          "image/svg+xml"
+                        );
+                        const svgElement = svgDoc.documentElement;
+
+                        document
+                          .querySelector("calendar")
+                          .appendChild(svgElement);
+                      });
+                  })();
+
+                  break;
+                }
+              }
+            })();
+          }
+        }
+      }
+    });
+
+    observer.observe(calendar, {
+      childList: true,
+      subtree: true,
+    });
+  }
+
   function injectContent() {
     console.log("Injecting content");
-
-    // const linksList = document.querySelector(".financial.expand-container");
-
-    /* for (const linksList of [
-      document.querySelector(".financial.expand-container"),
-      document.querySelector(".enrol.expand-container"),
-    ]) {
-      // Get the parent UL element (assuming the linksList is an <li> inside it)
-      // Get the parent <ul> element
-      const parentUL = linksList.parentElement;
-
-      // Reference to insert before the first child of the parent <ul>
-      const firstChild = parentUL.firstElementChild;
-
-      // Move the main <a> link into a new <li> and insert it at the start
-      const mainLink = linksList.querySelector("a");
-      if (mainLink) {
-        const newLI = document.createElement("li");
-        newLI.appendChild(mainLink);
-        parentUL.insertBefore(newLI, firstChild);
-      }
-
-      // Collect the <li> items from the nested <ul>
-      const nestedLIs = linksList.querySelectorAll("ul > li");
-
-      // Insert each <li> at the start in reverse order to preserve original order
-      [...nestedLIs].reverse().forEach((li) => {
-        parentUL.insertBefore(li, firstChild);
-      });
-
-      // Remove the now-empty linksList container
-      linksList.remove();
-    } */
 
     (function () {
       const financialList = document.querySelector(
@@ -632,7 +766,7 @@ ul.nav-section-container li {
         console.log("Found:", link.innerText);
         const parent = link.parentElement;
         fetch(
-          "https://raw.githubusercontent.com/TheAmanM/beaver/refs/heads/main/src/" +
+          "https://raw.githubusercontent.com/TheAmanM/beaver/refs/heads/main/src/icons/" +
             linkToSvg[link.innerText]
         )
           .then((response) => response.text())
@@ -654,11 +788,52 @@ ul.nav-section-container li {
           });
       }
     }
-
     const quercusLink = document.querySelector(
       ".nav-section-container sis-icon"
     );
     quercusLink.remove();
+
+    (function () {
+      const todaysTimetableElements = document.querySelectorAll(
+        "profile-checklist div"
+      );
+      console.log("Running replacer 2");
+      console.log(todaysTimetableElements);
+      for (const randomDiv of todaysTimetableElements) {
+        console.log("Checking 2");
+        if (
+          randomDiv.innerText.includes(
+            "You've completed your profile checklist"
+          )
+        ) {
+          console.log("Found! 2");
+          const replacer = document.createElement("p");
+          replacer.innerHTML = `Maintaining your personal information helps U of T serve you better and ensures that we can contact you.<br /><br />You’ve completed your profile checklist. You can always <a href="https://acorn.utoronto.ca/sws/#/profileAndSettings">visit the Profile page</a> to make updates.`;
+          document
+            .querySelector("profile-checklist .mat-mdc-card-content")
+            .replaceWith(replacer);
+          console.log("Replaced! 2");
+          break;
+        }
+      }
+    })();
+
+    (function () {
+      fetch(
+        "https://raw.githubusercontent.com/TheAmanM/beaver/refs/heads/main/src/backgrounds/profile.svg"
+      )
+        .then((response) => response.text())
+        .then((svgText) => {
+          // Parse the SVG text into DOM elements
+          const parser = new DOMParser();
+          const svgDoc = parser.parseFromString(svgText, "image/svg+xml");
+          const svgElement = svgDoc.documentElement;
+
+          document.querySelector("profile-checklist").appendChild(svgElement);
+        });
+    })();
+
+    todaysTimetable();
   }
 
   // Function to remove all <style> and <link rel="stylesheet"> tags

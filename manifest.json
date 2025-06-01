@@ -15,7 +15,7 @@
     {
       "matches": ["*://acorn.utoronto.ca/sws/*"],
       "js": ["content.js"],
-      "run_at": "document_end"
+      "run_at": "document_idle"
     }
   ]
 }
